@@ -52,16 +52,25 @@ DataPulse/
 
 The notebooks fix random seeds, split the data stratifiably, and fit all imputers, encoders, and scalers inside training pipelines. The test split is held out from model selection. Threshold selection is made on a separate validation split. Report test results only after finalizing a model and threshold. Features are observational associations, not proof of causes; the sample is a dated, fictionalized benchmark and should not be presented as representative of a current operator. No actual customer records or deployment decisions should rely on this model.
 
-The analysis intentionally includes a model card and a results template. Replace every `TBD` with values from a clean notebook run before citing metrics on a CV. Do not invent performance claims.
+The analysis includes a model card and reports the results from the saved notebook run below. These are benchmark results from one stratified holdout split, not a production estimate. Features are observational associations, not proof of causes; the dataset is a historical sample whose representativeness for any current operator is unknown. The model must not be used for actual customer decisions without fresh validation, fairness review, and a controlled intervention study.
 
-## CV-ready summary (complete after running)
+## Key findings
 
-**DataPulse — Customer Churn Intelligence (Python, Pandas, NumPy, scikit-learn)** — Audited and analyzed [N] customer records; compared [models] using stratified holdout validation and leakage-safe preprocessing; achieved [PR-AUC / ROC-AUC] on the untouched test set. At a [recall] operating point, identified [precision/top-decile lift] to inform capacity-aware retention experiments. Reproducible notebooks, statistical analysis, tests, and documented model limitations.
+- **Data quality:** 7,043 records and 21 columns; no duplicate rows or customer IDs. Eleven `TotalCharges` entries (0.16%) were blank and converted to missing values for pipeline imputation.
+- **Observed patterns:** 26.5% of customers churned. Churned customers had 17.98 months' average tenure versus 37.57 for retained customers, a difference of −19.59 months (bootstrap 95% CI: −20.70 to −18.48; Cohen's d: −0.85).
+- **Categorical associations:** contract type had the largest selected association with churn (Cramér's V = 0.41), followed by internet service (0.32) and payment method (0.30). These are unadjusted observational relationships, not causal effects.
+- **Model comparison:** logistic regression led five-fold development cross-validation (mean PR-AUC 0.669, ROC-AUC 0.846), ahead of random forest (0.656, 0.841) and histogram gradient boosting (0.646, 0.828).
+- **Held-out test:** the validation-selected logistic regression operating threshold was 0.614. Test PR-AUC was 0.634 and ROC-AUC 0.841; at that threshold, precision was 0.552, recall 0.693, and F1 0.614. The top 10% by predicted risk had 2.89× the test-set churn prevalence.
+- **Decision caveat:** the threshold was chosen to target at least 70% recall on validation data; test recall was lower at 69.3%. The top-decile lift describes ranking only. It does not estimate how many customers an offer would retain.
+
+## CV-ready summary
+
+**DataPulse — Customer Churn Intelligence (Python, Pandas, NumPy, scikit-learn)** — Analyzed 7,043 IBM Telco sample records, tested churn associations, and compared three leakage-safe classifiers. Logistic regression achieved 0.634 PR-AUC and 0.841 ROC-AUC on a stratified held-out test split; its top-risk decile had 2.89× test-set churn prevalence. Documented threshold trade-offs, data limitations, and an experiment-first retention use case.
 
 ## Suggested 1–2 week roadmap
 
 1. Days 1–2: run data audit and EDA; record hypotheses and source provenance.
 2. Days 3–4: complete statistical analysis and distinguish practical effects from significance.
 3. Days 5–7: compare baseline models, select an operating threshold, assess calibration and error trade-offs.
-4. Days 8–10: add a concise results narrative, polish charts and README, run tests from a clean environment, and publish the repository.
+4. Days 8–10: polish charts and notebook narratives, rerun tests from a clean environment, and publish the repository.
 
